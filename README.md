@@ -87,10 +87,23 @@ This is the place for you to write reflections:
 #### Reflection Subscriber-1
 1) In this tutorial, we used RwLock<> to synchronise the use of Vec of Notifications. Explain why it is necessary for this case, and explain why we do not use Mutex<> instead?
 
-    We RwLock because we expect many more read operations than writes. Numerous users may be reading notifications at the same time, while writes happen only when new notifications arrive. RwLock allows multiple threads to read concurrently, but still enforces exclusive access when a write occurs, thereby providing better performance in a read-heavy workload. In contrast, Mutex allows only a single thread, whether reading or writing to hold the lock at once, preventing concurrent reads and leading to unnecessary contention.
+    We use RwLock because we expect many more read operations than writes. Numerous users may be reading notifications at the same time, while writes happen only when new notifications arrive. RwLock allows multiple threads to read concurrently, but still enforces exclusive access when a write occurs, thereby providing better performance in a read-heavy workload. In contrast, Mutex allows only a single thread, whether reading or writing to hold the lock at once, preventing concurrent reads and leading to unnecessary contention.
 
 2) In this tutorial, we used lazy_static external library to define Vec and DashMap as a “static” variable. Compared to Java where we can mutate the content of a static variable via a static function, why did not Rust allow us to do so?
 
     Rust doesnt let you freely mutate a static variable the way Java does because Rust enforces strict rules to prevent data races and ensure memory safety. In Java, you can just call a static method and change a static variable anytime. In Rust, shared mutable data has to be carefully synchronized, so we cant just define and mutate a static Vec or DashMap without extra steps. The lazy_static library helps by safely initializing such data behind locks.
 
 #### Reflection Subscriber-2
+1) Have you explored things outside of the steps in the tutorial, for example: src/lib.rs? If not, explain why you did not do so. If yes, explain things that you have learned from those other parts of code.
+
+    I havent started exploring. I focused on the files directly related to the tutorial steps, such as the specific modules (controller, service, repository, and model) that were mentioned. Since lib.rs wasnt referenced in the tutorial steps, I prioritized completing the guided tasks before exploring additional files. 
+
+2) Since you have completed the tutorial by now and have tried to test your notification system by spawning multiple instances of Receiver, explain how Observer pattern eases you to plug in more subscribers. How about spawning more than one instance of Main app, will it still be easy enough to add to the system?
+
+    The Observer pattern makes adding subscribers simple because they can subscribe to a topic by sending a subscription request. This adds the subscriber to a dictionary of subscribers for that topic. When a notification is needed, the system automatically loops through all subscribers of the topic and sends a notification request to each. This means the existing code handles new subscribers seamlessly once they subscribe.
+
+    Running multiple instances of the Main app is also straightforward. You can set the APP_PUBLISHER_ROOT_URL of each Receiver to point to the desired Main app instance. Alternatively, a routing system can direct Receivers to specific instances, which they will remember. However, since each Main app instance uses its own static dictionary for subscribers, the subscriber lists may differ between instances unless a unified database is implemented.
+
+3) Have you tried to make your own Tests, or enhance documentation on your Postman collection? If you have tried those features, tell us whether it is useful for your work (it can be your tutorial work or your Group Project).
+
+    I havent tried creating my own tests or enhancing documentation in the Postman collection. I focused on completing the tutorial tasks and implementing the required functionality. However, I understand that these features could be useful for ensuring the API works as expected.
